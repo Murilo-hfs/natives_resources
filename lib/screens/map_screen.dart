@@ -4,14 +4,14 @@ import 'package:recursos_nativos/models/place.dart';
 
 class MapScreen extends StatefulWidget {
   final PlaceLocation initialLocation;
-  final bool isReadyOnly;
+  final bool isReadonly;
 
   MapScreen({
     this.initialLocation = const PlaceLocation(
-      latitude: 0.0,
-      longitude: 0.0,
+      latitude: 37.419857,
+      longitude: -122.078827,
     ),
-    this.isReadyOnly = false,
+    this.isReadonly = false,
   });
 
   @override
@@ -19,34 +19,30 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
-  Set<Marker> markers = Set();
   LatLng _pickedPosition;
 
-  void _selectedPosition(LatLng position) {
+  void _selectPosition(LatLng position) {
     setState(() {
       _pickedPosition = position;
     });
-  }
-
-    _newMarker() {
-    Marker resultMarker = Marker(
-  markerId: MarkerId('p1'),
-  infoWindow: InfoWindow(
-  snippet: "Position 1"),
-  position: LatLng(widget.initialLocation.latitude,
-  widget.initialLocation.longitude),
-);
-setState(() {
-markers.add(resultMarker);
-  
-});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Selecione'),
+        title: Text('Selecione...'),
+        actions: <Widget>[
+          if (!widget.isReadonly)
+            IconButton(
+              icon: Icon(Icons.check),
+              onPressed: _pickedPosition == null
+                  ? null
+                  : () {
+                      Navigator.of(context).pop(_pickedPosition);
+                    },
+            )
+        ],
       ),
       body: GoogleMap(
         initialCameraPosition: CameraPosition(
@@ -56,8 +52,16 @@ markers.add(resultMarker);
           ),
           zoom: 13,
         ),
-        onTap: _newMarker(),
-        markers: markers,
+        onTap: widget.isReadonly ? null : _selectPosition,
+        markers: (_pickedPosition == null && !widget.isReadonly)
+            ? null
+            : {
+                Marker(
+                  markerId: MarkerId('p1'),
+                  position:
+                      _pickedPosition ?? widget.initialLocation.toLatLng(),
+                ),
+              },
       ),
     );
   }

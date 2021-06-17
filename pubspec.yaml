@@ -18,18 +18,22 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.3.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  provider: ^5.0.0 
-  image_picker: ^0.7.5+2
-  path_provider: ^2.0.1
-  path: ^1.8.0
-  sqflite: ^2.0.0+3
-  location: ^4.1.1
-  google_maps_flutter: ^2.0.5
+  provider:
+  image_picker: 
+  path_provider: 
+  path: 
+  sqflite: 
+  location: 
+  google_maps_flutter: 
+  dio: 
+  http_parser: 
+  http: 
+  image_picker_platform_interface: 
 
 
   # The following adds the Cupertino Icons font to your application.

@@ -3,13 +3,13 @@ import 'package:provider/provider.dart';
 import 'package:recursos_nativos/providers/great_places.dart';
 import 'package:recursos_nativos/utils/app_routes.dart';
 
-class PlaceListScreen extends StatelessWidget {
+class PlacesListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('PlaceListScreen'),
-        actions: [
+        title: Text('Meus Lugares'),
+        actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
@@ -19,15 +19,13 @@ class PlaceListScreen extends StatelessWidget {
         ],
       ),
       body: FutureBuilder(
-        future: Provider.of<GreatPlaces>(context, listen: false).loadPLaces(),
+        future: Provider.of<GreatPlaces>(context, listen: false).loadPlaces(),
         builder: (ctx, snapshot) => snapshot.connectionState ==
                 ConnectionState.waiting
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
+            ? Center(child: CircularProgressIndicator())
             : Consumer<GreatPlaces>(
                 child: Center(
-                  child: Text("Nenhum local cadastrado"),
+                  child: Text('Nenhum local cadastrado!'),
                 ),
                 builder: (ctx, greatPlaces, ch) => greatPlaces.itemsCount == 0
                     ? ch
@@ -36,11 +34,18 @@ class PlaceListScreen extends StatelessWidget {
                         itemBuilder: (ctx, i) => ListTile(
                           leading: CircleAvatar(
                             backgroundImage: FileImage(
-                              greatPlaces.itemsByIndex(i).image,
+                              greatPlaces.itemByIndex(i).image,
                             ),
                           ),
-                          title: Text(greatPlaces.itemsByIndex(i).title),
-                          onTap: () {},
+                          title: Text(greatPlaces.itemByIndex(i).title),
+                          subtitle:
+                              Text(greatPlaces.itemByIndex(i).location.address),
+                          onTap: () {
+                            Navigator.of(context).pushNamed(
+                              AppRoutes.PLACE_DETAIL,
+                              arguments: greatPlaces.itemByIndex(i),
+                            );
+                          },
                         ),
                       ),
               ),

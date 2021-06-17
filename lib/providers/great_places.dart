@@ -1,23 +1,31 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:recursos_nativos/models/place.dart';
 import 'package:recursos_nativos/utils/db_util.dart';
+import 'package:recursos_nativos/utils/location_util.dart';
 
 class GreatPlaces with ChangeNotifier {
   List<Place> _items = [];
 
-  Future<void> loadPLaces() async{
+  Future<void> loadPlaces() async {
     final dataList = await DbUtil.getData('places');
-    _items = dataList.map(
-      (item) => Place(
-        id: item['id'],
-        title: item['title'],
-        image: File(item['image']),
-        location: null,
-      ),
-    ).toList();
+    _items = dataList
+        .map(
+          (item) => Place(
+            id: item['id'],
+            title: item['title'],
+            image: File(item['image']),
+            location: PlaceLocation(
+              latitude: item['latitude'],
+              longitude: item['longitude'],
+              address: item['address'],
+            ),
+          ),
+        )
+        .toList();
     notifyListeners();
   }
 
@@ -29,22 +37,36 @@ class GreatPlaces with ChangeNotifier {
     return _items.length;
   }
 
-  Place itemsByIndex(int index) {
+  Place itemByIndex(int index) {
     return _items[index];
   }
 
-  void addPlace(String title, File image) {
+  Future<void> addPlace(
+    String title,
+    File image,
+    LatLng position,
+  ) async {
+    String address = await LocationUtil.getAddressFrom(position);
+
     final newPlace = Place(
       id: Random().nextDouble().toString(),
       title: title,
       image: image,
-      location: null,
+      location: PlaceLocation(
+        latitude: position.latitude,
+        longitude: position.longitude,
+        address: address,
+      ),
     );
+
     _items.add(newPlace);
     DbUtil.insert('places', {
       'id': newPlace.id,
       'title': newPlace.title,
       'image': newPlace.image.path,
+      'latitude': position.latitude,
+      'longitude': position.longitude,
+      'address': address,
     });
     notifyListeners();
   }
